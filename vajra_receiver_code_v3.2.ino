@@ -10,7 +10,7 @@ const char* cmd_topic = "crabs/commands/immo";
 const char* rate_topic = "crabs/commands/rate";
 const char* geo_topic = "crabs/commands/geofence"; 
 const char* alert_topic = "crabs/alerts/geofence"; 
-const char* sleep_topic = "crabs/commands/sleep"; // PHASE 5
+const char* sleep_topic = "crabs/commands/sleep";
 
 WiFiClientSecure espClient; 
 PubSubClient client(espClient);
@@ -18,7 +18,7 @@ PubSubClient client(espClient);
 const int IMMO_RELAY_PIN = D0;
 unsigned long frameNumber = 0;
 
-// --- EDGE GEOFENCING MEMORY ---
+
 #define MAX_POLY_POINTS 10
 struct Point { double lat; double lon; };
 Point geofence[MAX_POLY_POINTS];
@@ -26,12 +26,11 @@ int geofenceSize = 0;
 bool geofenceActive = false;
 bool geofenceViolation = false;
 
-// --- GPS SIMULATOR ---
+
 double currentLat = 10.060000;
 double currentLon = 76.620000;
 unsigned long lastGpsUpdate = 0;
 
-// --- RAY-CASTING ALGORITHM ---
 bool isInsidePolygon(double testLat, double testLon) {
   if (geofenceSize < 3) return true; 
   bool c = false;
@@ -109,7 +108,7 @@ void reconnect() {
       client.subscribe(cmd_topic);
       client.subscribe(rate_topic);
       client.subscribe(geo_topic);
-      client.subscribe(sleep_topic); // PHASE 5 Subscribe
+      client.subscribe(sleep_topic); 
       Serial.println("MQTT Connected & Subscribed");
     } else { delay(5000); }
   }
@@ -138,7 +137,7 @@ void loop() {
 
       frameNumber++; 
       
-      // --- THE GPS SIMULATOR & EDGE KILL SWITCH ---
+      
       float speedFloat = spdStr.toFloat();
       if (millis() - lastGpsUpdate > 1000) { 
         if (speedFloat > 0 && !geofenceViolation) {
@@ -147,7 +146,7 @@ void loop() {
         }
         lastGpsUpdate = millis();
 
-        // Check Ray-Casting Algorithm
+        
         if (geofenceActive && !geofenceViolation) {
           if (!isInsidePolygon(currentLat, currentLon)) {
             geofenceViolation = true;
